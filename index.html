@@ -248,7 +248,7 @@
         
         function createDetailsPanel(cls) {
             // *** UPDATED: Parse multi-line and space/comma-separated competency numbers ***
-            const cbmeCompNoLines = cls['CBME Competency No.'].split(/[\n,]+/).map(item => item.trim()).filter(Boolean);
+            const cbmeCompNoLines = cls['CBME Competency No.'].split(/[\n, ]+/).map(item => item.trim()).filter(Boolean);
             const lectureContentLines = cls['Lecture Content as per CBME'].split('\n').map(item => item.trim());
             const domainLines = cls['Domain (K/S/A/C)'].split(/\s+/).filter(Boolean);
             const levelLines = cls['Level (K/KH/SH/P)'].split(/\s+/).filter(Boolean);
