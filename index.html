@@ -71,19 +71,19 @@
                 </div>
             </div>
             
-            <div class="mb-8 border-t border-gray-200 pt-6">
+            <div id="dashboard-content" class="overflow-x-auto">
+                <!-- Classes will be dynamically inserted here -->
+                <p class="text-center text-gray-500 py-10">Loading schedule...</p>
+            </div>
+
+            <!-- *** MOVED PDF LINK TO THE BOTTOM *** -->
+            <div class="mt-8 border-t border-gray-200 pt-6 text-center">
                  <a href="https://drive.google.com/file/d/1Whoi35EpE4FRQFqLLTZX2TR_A7jMBUXW/view?usp=drive_link" target="_blank" class="inline-flex items-center bg-green-100 text-green-800 font-semibold py-2 px-4 rounded-lg text-sm transition-colors hover:bg-green-200">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                     View Approved Schedule (PDF)
                 </a>
-            </div>
-
-
-            <div id="dashboard-content" class="overflow-x-auto">
-                <!-- Classes will be dynamically inserted here -->
-                <p class="text-center text-gray-500 py-10">Loading schedule...</p>
             </div>
         </div>
     </div>
@@ -215,6 +215,17 @@
         }
 
         function createCardHTML(cls, uniqueId) {
+            // *** UPDATED: Color coding based on TLM ***
+            const tlmColors = {
+                'Lecture': 'bg-blue-50 border-blue-200',
+                'SGL': 'bg-green-50 border-green-200',
+                'DOAP-A': 'bg-yellow-50 border-yellow-200',
+                'DOAP-B': 'bg-yellow-50 border-yellow-200',
+                'Practical': 'bg-purple-50 border-purple-200',
+                'Tutorial': 'bg-pink-50 border-pink-200',
+            };
+            const cardColor = tlmColors[cls.TLM] || 'bg-white border-gray-200';
+
             const venue = cls['Venue'] ? `
                 <div class="flex items-center text-xs text-gray-500 capitalize mt-1">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
@@ -222,7 +233,7 @@
                 </div>` : '';
 
             return `
-                <div class="card bg-white p-4 rounded-lg border border-gray-200 flex flex-col">
+                <div class="card ${cardColor} p-4 rounded-lg border flex flex-col">
                     <div class="flex justify-between items-start">
                         <div>
                             <div class="flex items-center text-xs text-gray-500 mb-2">
