@@ -89,7 +89,6 @@
     </div>
 
     <script>
-        // *** UPDATED GOOGLE SHEET URL ***
         const googleSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRO72s6aR0pRLGcn8uyS-Do5BJ-G3VCFg1pbRJS-QS4j8qYmNK5aj8J2JWhu6BdGLUOrq6wvSrBA4Jy/pub?gid=0&single=true&output=csv';
         let currentMonday = getStartOfWeek(new Date());
         let allClassData = [];
@@ -298,16 +297,17 @@
 
         function getTeacherLinks(cls) {
             let links = '';
-            // *** UPDATED: Create separate arrays for different roles ***
+            // *** UPDATED: Parse multiple SRs and JRs from single cells ***
             const faculty = [
                 { name: cls['Faculty 1 Name'], mobile: cls['Faculty 1 Telephone No.'] },
                 { name: cls['Faculty 2 Name'], mobile: cls['Faculty 2 Telephone No.'] },
                 { name: cls['Faculty 3 Name'], mobile: cls['Faculty 3 Telephone No.'] }
             ];
-            const residents = [
-                { name: cls['SR Name'], mobile: cls['SR Telephone No.'], role: 'SR' },
-                { name: cls['JR Name'], mobile: cls['JR Telephone No.'], role: 'JR' }
-            ];
+
+            const srNames = (cls['SR Name'] || '').split('\n').filter(Boolean);
+            const srMobiles = (cls['SR Telephone No.'] || '').split('\n').filter(Boolean);
+            const jrNames = (cls['JR Name'] || '').split('\n').filter(Boolean);
+            const jrMobiles = (cls['JR Telephone No.'] || '').split('\n').filter(Boolean);
 
             faculty.forEach(person => {
                 if (person.name && person.mobile) {
@@ -320,14 +320,24 @@
                 }
             });
 
-            residents.forEach(person => {
-                if (person.name && person.mobile) {
-                    const message = generateWhatsAppMessage(cls, person.name);
-                    const waLink = `https://wa.me/${person.mobile.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
-                    // Use a different color for residents
+            srNames.forEach((name, i) => {
+                if (name && srMobiles[i]) {
+                    const message = generateWhatsAppMessage(cls, name);
+                    const waLink = `https://wa.me/${srMobiles[i].replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
                     links += `<a href="${waLink}" target="_blank" class="flex items-center bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-1 rounded-full hover:bg-gray-200 transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" /></svg>
-                                ${person.name} (${person.role})
+                                ${name} (SR)
+                              </a>`;
+                }
+            });
+
+            jrNames.forEach((name, i) => {
+                if (name && jrMobiles[i]) {
+                    const message = generateWhatsAppMessage(cls, name);
+                    const waLink = `https://wa.me/${jrMobiles[i].replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
+                    links += `<a href="${waLink}" target="_blank" class="flex items-center bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-1 rounded-full hover:bg-gray-200 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" /></svg>
+                                ${name} (JR)
                               </a>`;
                 }
             });
