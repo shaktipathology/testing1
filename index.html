@@ -247,15 +247,16 @@
         }
         
         function createDetailsPanel(cls) {
-            // *** UPDATED: Parse multi-line competency numbers ***
-            const cbmeCompNoLines = cls['CBME Competency No.'].split('\n').map(item => item.trim());
-            const lectureContentLines = cls['Lecture Content as per CBME'].split('\n');
-            const domainLines = cls['Domain (K/S/A/C)'].split(/\s+/);
-            const levelLines = cls['Level (K/KH/SH/P)'].split(/\s+/);
-            const coreLines = cls['Core (Y/N)'].split(/\s+/);
+            // *** UPDATED: Parse multi-line and space/comma-separated competency numbers ***
+            const cbmeCompNoLines = cls['CBME Competency No.'].split(/[\n,]+/).map(item => item.trim());
+            const lectureContentLines = cls['Lecture Content as per CBME'].split('\n').map(item => item.trim());
+            const domainLines = cls['Domain (K/S/A/C)'].split(/\s+/).filter(Boolean);
+            const levelLines = cls['Level (K/KH/SH/P)'].split(/\s+/).filter(Boolean);
+            const coreLines = cls['Core (Y/N)'].split(/\s+/).filter(Boolean);
 
             let tableRows = '';
-            for (let i = 0; i < lectureContentLines.length; i++) {
+            const maxRows = Math.max(lectureContentLines.length, cbmeCompNoLines.length);
+            for (let i = 0; i < maxRows; i++) {
                 tableRows += `
                     <tr class="border-b last:border-b-0">
                         <td class="py-1 px-2">${cbmeCompNoLines[i] || ''}</td>
@@ -304,10 +305,10 @@
                 { name: cls['Faculty 3 Name'], mobile: cls['Faculty 3 Telephone No.'] }
             ];
 
-            const srNames = (cls['SR Name'] || '').split('\n').filter(Boolean);
-            const srMobiles = (cls['SR Telephone No.'] || '').split('\n').filter(Boolean);
-            const jrNames = (cls['JR Name'] || '').split('\n').filter(Boolean);
-            const jrMobiles = (cls['JR Telephone No.'] || '').split('\n').filter(Boolean);
+            const srNames = (cls['SR Name'] || '').split(/,|\n/).map(s => s.trim()).filter(Boolean);
+            const srMobiles = (cls['SR Telephone No.'] || '').split(/,|\n/).map(s => s.trim()).filter(Boolean);
+            const jrNames = (cls['JR Name'] || '').split(/,|\n/).map(s => s.trim()).filter(Boolean);
+            const jrMobiles = (cls['JR Telephone No.'] || '').split(/,|\n/).map(s => s.trim()).filter(Boolean);
 
             faculty.forEach(person => {
                 if (person.name && person.mobile) {
