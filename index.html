@@ -358,7 +358,9 @@
         function getStartOfWeek(date) {
             const d = new Date(date);
             const day = d.getDay();
-            const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+            // *** FIX: Corrected logic to always start the week on Monday ***
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1); // day is 0 for Sunday
+            d.setHours(0, 0, 0, 0); // Set to the beginning of the day
             return new Date(d.setDate(diff));
         }
 
