@@ -364,7 +364,7 @@
             const dayOfWeek = cls.Day;
             const formattedDate = date.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
             const startTimeOnly = formatTimeAMPM(cls['Start time']);
-            return `Dear ${teacherName},\n\nThis is a gentle reminder for your upcoming academic session scheduled for the MBBS 2024 Batch:\n\n*Topic:* *${cls.Topic}*\n*When:* *${dayOfWeek}, ${formattedDate} at ${startTimeOnly}*\nTeaching Learning Method: ${cls.TLM}\nFaculty/Host:            ${teacherName}\nBatch:                   MBBS 2024\n\nKindly let us know in advance if any support or adjustments are required.\n\nWarm regards,\nDr. Shakti Kumar Yadav`;
+            return `Dear ${teacherName},\n\nThis is a gentle reminder for your upcoming academic session scheduled for the MBBS 2024 Batch:\n\n*Topic:* *${cls.Topic}*\n*When:* *${dayOfWeek}, ${formattedDate} at ${startTimeOnly}*\nTeaching Learning Method: ${cls.TLM}\nFaculty/Host:            ${teacherName}\nBatch:                   MBBS 2024\n\nWarm regards,\nDr. Shakti Kumar Yadav`;
         }
         
         function getStartOfWeek(date) {
