@@ -46,7 +46,6 @@
         <div class="bg-white rounded-2xl shadow-lg p-6 sm:p-8">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
                 <div>
-                    <!-- *** UPDATED TITLE AND SUBTITLE *** -->
                     <h1 class="text-2xl font-bold text-gray-900">Weekly Class Schedule</h1>
                     <p class="text-sm text-gray-500">Dept. of Pathology and Lab Medicine, AIIMS Bhopal</p>
                     <p id="week-range" class="text-sm text-gray-500 mt-1">Loading week range...</p>
@@ -71,6 +70,16 @@
                     </div>
                 </div>
             </div>
+            
+            <div class="mb-8 border-t border-gray-200 pt-6">
+                 <a href="https://drive.google.com/file/d/1Whoi35EpE4FRQFqLLTZX2TR_A7jMBUXW/view?usp=drive_link" target="_blank" class="inline-flex items-center bg-green-100 text-green-800 font-semibold py-2 px-4 rounded-lg text-sm transition-colors hover:bg-green-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    View Approved Schedule (PDF)
+                </a>
+            </div>
+
 
             <div id="dashboard-content" class="overflow-x-auto">
                 <!-- Classes will be dynamically inserted here -->
@@ -80,7 +89,8 @@
     </div>
 
     <script>
-        const googleSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRLZgszG50LpQTnG3MaOBmeBnOWCDO0iaTGOmpontTy9OXGA_xFiMXI5lqPYK1bbZ-OzV3A60Wv_ygF/pub?gid=0&single=true&output=csv';
+        // *** UPDATED GOOGLE SHEET URL ***
+        const googleSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRO72s6aR0pRLGcn8uyS-Do5BJ-G3VCFg1pbRJS-QS4j8qYmNK5aj8J2JWhu6BdGLUOrq6wvSrBA4Jy/pub?gid=0&single=true&output=csv';
         let currentMonday = getStartOfWeek(new Date());
         let allClassData = [];
 
@@ -149,11 +159,13 @@
             if (searchTerm) {
                 classesToRender = allClassData.filter(cls => {
                     const topicMatch = cls.Topic.toLowerCase().includes(searchTerm);
-                    const teacher1Match = (cls['Teacher 1 name'] || '').toLowerCase().includes(searchTerm);
-                    const teacher2Match = (cls['Teacher 2 name'] || '').toLowerCase().includes(searchTerm);
-                    const teacher3Match = (cls['Teacher 3 name'] || '').toLowerCase().includes(searchTerm);
-                    const teacher4Match = (cls['Teacher 4 name'] || '').toLowerCase().includes(searchTerm);
-                    return cls['Start time'] && (topicMatch || teacher1Match || teacher2Match || teacher3Match || teacher4Match);
+                    // *** UPDATED: Search now includes Faculty, SR, and JR names ***
+                    const teacher1Match = (cls['Faculty 1 Name'] || '').toLowerCase().includes(searchTerm);
+                    const teacher2Match = (cls['Faculty 2 Name'] || '').toLowerCase().includes(searchTerm);
+                    const teacher3Match = (cls['Faculty 3 Name'] || '').toLowerCase().includes(searchTerm);
+                    const srMatch = (cls['SR Name'] || '').toLowerCase().includes(searchTerm);
+                    const jrMatch = (cls['JR Name'] || '').toLowerCase().includes(searchTerm);
+                    return cls['Start time'] && (topicMatch || teacher1Match || teacher2Match || teacher3Match || srMatch || jrMatch);
                 });
                 weekRangeEl.textContent = `Showing all results for "${searchTerm}"`;
                 navButtons.forEach(id => document.getElementById(id).disabled = true);
@@ -224,7 +236,6 @@
                         </div>
                     </div>
                     <div class="mt-3 pt-3 border-t border-gray-200">
-                        <!-- *** ADDED FACULTY HEADING *** -->
                         <p class="font-semibold text-xs text-gray-700 mb-2">Faculty:</p>
                         <div class="flex flex-wrap gap-2">
                             ${getTeacherLinks(cls)}
@@ -287,18 +298,25 @@
 
         function getTeacherLinks(cls) {
             let links = '';
-            for (let i = 1; i <= 4; i++) {
-                const name = cls[`Teacher ${i} name`];
-                const mobile = cls[`Teacher ${i} mobile`];
-                if (name && mobile) {
-                    const message = generateWhatsAppMessage(cls, name);
-                    const waLink = `https://wa.me/${mobile.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
+            // *** UPDATED: Loop through Faculty, SR, and JR columns ***
+            const staff = [
+                { name: cls['Faculty 1 Name'], mobile: cls['Faculty 1 Telephone No.'] },
+                { name: cls['Faculty 2 Name'], mobile: cls['Faculty 2 Telephone No.'] },
+                { name: cls['Faculty 3 Name'], mobile: cls['Faculty 3 Telephone No.'] },
+                { name: cls['SR Name'], mobile: cls['SR Telephone No.'] },
+                { name: cls['JR Name'], mobile: cls['JR Telephone No.'] }
+            ];
+
+            staff.forEach(person => {
+                if (person.name && person.mobile) {
+                    const message = generateWhatsAppMessage(cls, person.name);
+                    const waLink = `https://wa.me/${person.mobile.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
                     links += `<a href="${waLink}" target="_blank" class="flex items-center bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-1 rounded-full hover:bg-indigo-200 transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" /></svg>
-                                ${name}
+                                ${person.name}
                               </a>`;
                 }
-            }
+            });
             return links || '<p class="text-xs text-gray-500">No teachers assigned.</p>';
         }
 
